@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{TITLE}}</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --border: #e2e2e2;
+  --border-strong: #c8c8c8;
+  --text: #111111;
+  --text-secondary: #555555;
+  --text-muted: #888888;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --danger: #dc2626;
+  --success: #16a34a;
+  --row-alt: #f5f5f5;
+  --disabled-bg: #fef2f2;
+  --enabled-bg: #f0fdf4;
+  --mono: "SF Mono", "Cascadia Code", "Fira Code", Consolas, "Liberation Mono", monospace;
+  --sans: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, sans-serif;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ---- Dashboard ---- */
+
+#dashboard-view {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+.dash-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.dash-header .title-group h1 {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.dash-header .title-group span {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.btn:hover { border-color: var(--border-strong); background: var(--bg); }
+
+.btn--primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.btn--primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.btn--danger {
+  color: var(--danger);
+  border-color: transparent;
+  background: transparent;
+  padding: 7px 10px;
+}
+
+.btn--danger:hover { background: #fef2f2; }
+
+.btn--sm { padding: 5px 10px; font-size: 11px; }
+
+/* ---- Table ---- */
+
+.accounts-table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+thead th {
+  text-align: left;
+  padding: 10px 16px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+tbody td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+tbody tr:nth-child(even) td { background: var(--row-alt); }
+tbody tr:last-child td { border-bottom: none; }
+
+td.col-idx {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  width: 48px;
+}
+
+td.col-email {
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+td.col-status { width: 100px; }
+
+td.col-balance {
+  font-family: var(--mono);
+  font-size: 13px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+td.col-balance .balance-val { font-weight: 600; }
+td.col-balance .balance-depleted { color: var(--danger); }
+td.col-balance .balance-ok { color: var(--success); }
+td.col-balance .balance-loading { color: var(--text-muted); font-size: 11px; }
+td.col-balance .balance-err { color: var(--text-muted); font-size: 11px; }
+
+.status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--mono);
+  letter-spacing: 0.3px;
+}
+
+.status-badge--on {
+  background: var(--enabled-bg);
+  color: var(--success);
+  border: 1px solid #bbf7d0;
+}
+
+.status-badge--off {
+  background: var(--disabled-bg);
+  color: var(--danger);
+  border: 1px solid #fecaca;
+}
+
+td.col-actions {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.empty-state {
+  padding: 48px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* ---- Modal ---- */
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  width: 100%;
+  max-width: 440px;
+  padding: 32px;
+  position: relative;
+}
+
+.modal h2 {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.modal p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.modal a {
+  color: var(--accent);
+  word-break: break-all;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.modal a:hover { text-decoration: none; }
+
+.modal-status {
+  margin-top: 20px;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.modal-close:hover { color: var(--text); }
+
+.confirm-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 600px) {
+  #dashboard-view { padding: 24px 12px 60px; }
+  .dash-header { flex-direction: column; gap: 8px; }
+  thead th, tbody td { padding: 8px 10px; }
+  td.col-idx { display: none; }
+  th:first-child { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div id="dashboard-view">
+  <div class="dash-header">
+    <div class="title-group">
+      <h1>{{TITLE}}</h1>
+      <span>Account Management</span>
+    </div>
+    <button class="btn btn--primary" onclick="startLogin()">Add Account</button>
+    <button class="btn" onclick="fetchBalances()">Refresh Balance</button>
+  </div>
+
+  <div class="accounts-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Email</th>
+          <th>Balance</th>
+          <th>Status</th>
+          <th style="text-align:right">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="accounts-body">
+        <tr><td colspan="5" class="empty-state">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Device Login Modal -->
+<div class="modal-overlay" id="login-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeLoginModal()">&times;</button>
+    <h2>Add Account</h2>
+    <p>Open the link below and authorize the device:</p>
+    <p><a id="modal-url" href="#" target="_blank" rel="noopener"></a></p>
+    <div class="modal-status" id="modal-status">Waiting for authorization...</div>
+  </div>
+</div>
+
+<script>
+let pollTimer = null;
+
+async function loadAccounts() {
+  const body = document.getElementById('accounts-body');
+  try {
+    const res = await fetch('/api/accounts');
+    const data = await res.json();
+    const accounts = data.accounts || [];
+
+    if (accounts.length === 0) {
+      body.innerHTML = '<tr><td colspan="5" class="empty-state">No accounts configured. Click "Add Account" to get started.</td></tr>';
+      return;
+    }
+
+    body.innerHTML = accounts.map(a => {
+      const enabled = a.enabled !== false;
+      const badge = enabled
+        ? '<span class="status-badge status-badge--on">ACTIVE</span>'
+        : '<span class="status-badge status-badge--off">DISABLED</span>';
+      const toggleBtn = enabled
+        ? `<button class="btn btn--sm" onclick="toggleAccount(${a.index}, false)">Disable</button>`
+        : `<button class="btn btn--sm btn--primary" onclick="toggleAccount(${a.index}, true)">Enable</button>`;
+
+      return `<tr>
+        <td class="col-idx">${a.index}</td>
+        <td class="col-email">${esc(a.email)}</td>
+        <td class="col-balance" id="bal-${a.index}"><span class="balance-loading">--</span></td>
+        <td class="col-status">${badge}</td>
+        <td class="col-actions" id="actions-${a.index}">
+          ${toggleBtn}
+          <button class="btn btn--sm btn--danger" onclick="confirmDelete(${a.index})">Delete</button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch (e) {
+    body.innerHTML = '<tr><td colspan="5" class="empty-state">Failed to load accounts.</td></tr>';
+  }
+}
+
+async function fetchBalances() {
+  try {
+    const res = await fetch('/api/accounts/balance');
+    const data = await res.json();
+    for (const b of (data.balances || [])) {
+      const cell = document.getElementById('bal-' + b.index);
+      if (!cell) continue;
+      if (b.balance !== null && b.balance !== undefined) {
+        const cls = b.isDepleted ? 'balance-depleted' : 'balance-ok';
+        cell.innerHTML = `<span class="balance-val ${cls}">$${Number(b.balance).toFixed(2)}</span>`;
+      } else {
+        cell.innerHTML = `<span class="balance-err">${esc(b.error || 'N/A')}</span>`;
+      }
+    }
+  } catch (e) {
+    // silently ignore balance fetch errors
+  }
+}
+
+async function toggleAccount(index, enable) {
+  const endpoint = enable ? 'enable' : 'disable';
+  await fetch(`/api/accounts/${index}/${endpoint}`, { method: 'POST' });
+  loadAccounts();
+}
+
+function confirmDelete(index) {
+  const cell = document.getElementById('actions-' + index);
+  cell.innerHTML = `<span class="confirm-bar">Delete?
+    <button class="btn btn--sm btn--danger" onclick="deleteAccount(${index})">Yes</button>
+    <button class="btn btn--sm" onclick="loadAccounts()">No</button>
+  </span>`;
+}
+
+async function deleteAccount(index) {
+  await fetch(`/api/accounts/${index}`, { method: 'DELETE' });
+  loadAccounts();
+}
+
+async function startLogin() {
+  const modal = document.getElementById('login-modal');
+  const urlEl = document.getElementById('modal-url');
+  const statusEl = document.getElementById('modal-status');
+
+  statusEl.textContent = 'Requesting device code...';
+  urlEl.textContent = '';
+  urlEl.href = '#';
+  modal.classList.add('active');
+
+  try {
+    const res = await fetch('/api/accounts/login', { method: 'POST' });
+    if (!res.ok) {
+      statusEl.textContent = 'Failed to start login flow.';
+      return;
+    }
+    const data = await res.json();
+
+    urlEl.textContent = data.verificationUrl;
+    urlEl.href = data.verificationUrl;
+    statusEl.textContent = 'Waiting for authorization...';
+
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(async () => {
+      try {
+        const pr = await fetch(`/api/accounts/login/${data.deviceCode}`);
+        if (pr.status === 410) {
+          statusEl.textContent = 'Device code expired. Close and try again.';
+          clearInterval(pollTimer);
+          pollTimer = null;
+          return;
+        }
+        const pd = await pr.json();
+        if (pd.status === 'approved') {
+          statusEl.textContent = 'Authorized: ' + pd.email;
+          clearInterval(pollTimer);
+          pollTimer = null;
+          setTimeout(() => { closeLoginModal(); loadAccounts(); }, 1500);
+        }
+      } catch (e) {}
+    }, 3000);
+  } catch (e) {
+    statusEl.textContent = 'Connection failed.';
+  }
+}
+
+function closeLoginModal() {
+  document.getElementById('login-modal').classList.remove('active');
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+}
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+loadAccounts();
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+services:
+  kilo2api:
+    build: .
+    container_name: kilo2api
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - HOST=0.0.0.0
+      - PORT=9090
+    restart: unless-stopped
