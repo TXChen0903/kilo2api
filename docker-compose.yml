@@ -9,4 +9,5 @@ services:
     environment:
       - HOST=0.0.0.0
       - PORT=9090
+      - ACCOUNTS_DIR=/app/data
     restart: unless-stopped

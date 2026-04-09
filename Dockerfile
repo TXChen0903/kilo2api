@@ -21,6 +21,7 @@ COPY --from=builder /app/.venv /app/.venv
 COPY pyproject.toml ./
 COPY core/ core/
 COPY provider.py config.py main.py ./
+COPY core/static/ static/
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
