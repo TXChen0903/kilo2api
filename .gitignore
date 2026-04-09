@@ -3,3 +3,6 @@ __pycache__/
 kilo_req/
 *.json
 PLAN.md
+.python-version
+.venv/
+data/
