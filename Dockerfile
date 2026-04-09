@@ -20,13 +20,8 @@ COPY core/ core/
 COPY provider.py config.py main.py ./
 
 ENV PATH="/app/.venv/bin:$PATH"
-ENV ACCOUNTS_DIR=/app/data
-ENV HOST=0.0.0.0
-ENV PORT=9090
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-
-VOLUME /app/data
 
 EXPOSE 9090
 
