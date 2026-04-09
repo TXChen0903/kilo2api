@@ -3,7 +3,7 @@ services:
     build: .
     container_name: kilo2api
     ports:
-      - "9090:9090"
+      - "10904:9090"
     volumes:
       - ./data:/app/data
     environment:

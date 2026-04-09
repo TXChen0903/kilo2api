@@ -280,6 +280,44 @@ td.col-actions {
   color: var(--text-muted);
 }
 
+/* ---- Login Modal ---- */
+
+.modal-url-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.modal-url-code {
+  flex: 1;
+  padding: 8px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  word-break: break-all;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.modal-hint {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.modal-hint ol {
+  margin: 4px 0 0 18px;
+}
+
+.modal-hint li {
+  margin-bottom: 2px;
+}
+
 /* ---- Responsive ---- */
 
 @media (max-width: 600px) {
@@ -326,8 +364,20 @@ td.col-actions {
   <div class="modal">
     <button class="modal-close" onclick="closeLoginModal()">&times;</button>
     <h2>Add Account</h2>
-    <p>Open the link below and authorize the device:</p>
-    <p><a id="modal-url" href="#" target="_blank" rel="noopener"></a></p>
+    <p>To avoid using the wrong Google account, open the link in an <strong>incognito / private window</strong>:</p>
+    <div class="modal-url-row">
+      <code id="modal-url-text" class="modal-url-code"></code>
+      <button class="btn btn--sm btn--primary" onclick="copyVerificationUrl()">Copy</button>
+    </div>
+    <div class="modal-hint">
+      <strong>Steps:</strong>
+      <ol>
+        <li>Click <strong>Copy</strong> above</li>
+        <li>Open a new <strong>Incognito / InPrivate</strong> window</li>
+        <li>Paste the URL and press Enter</li>
+        <li>Sign in with the desired Google account</li>
+      </ol>
+    </div>
     <div class="modal-status" id="modal-status">Waiting for authorization...</div>
   </div>
 </div>
@@ -412,12 +462,11 @@ async function deleteAccount(index) {
 
 async function startLogin() {
   const modal = document.getElementById('login-modal');
-  const urlEl = document.getElementById('modal-url');
+  const urlTextEl = document.getElementById('modal-url-text');
   const statusEl = document.getElementById('modal-status');
 
   statusEl.textContent = 'Requesting device code...';
-  urlEl.textContent = '';
-  urlEl.href = '#';
+  urlTextEl.textContent = '';
   modal.classList.add('active');
 
   try {
@@ -428,8 +477,7 @@ async function startLogin() {
     }
     const data = await res.json();
 
-    urlEl.textContent = data.verificationUrl;
-    urlEl.href = data.verificationUrl;
+    urlTextEl.textContent = data.verificationUrl;
     statusEl.textContent = 'Waiting for authorization...';
 
     if (pollTimer) clearInterval(pollTimer);
@@ -454,6 +502,27 @@ async function startLogin() {
   } catch (e) {
     statusEl.textContent = 'Connection failed.';
   }
+}
+
+async function copyVerificationUrl() {
+  const url = document.getElementById('modal-url-text').textContent;
+  if (!url) return;
+  try {
+    await navigator.clipboard.writeText(url);
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = url;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+  const btn = event.target;
+  const orig = btn.textContent;
+  btn.textContent = 'Copied!';
+  setTimeout(() => { btn.textContent = orig; }, 2000);
 }
 
 function closeLoginModal() {
