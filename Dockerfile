@@ -13,16 +13,18 @@ RUN uv sync --frozen --no-dev
 
 FROM python:3.12-slim
 
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
 WORKDIR /app
 
 COPY --from=builder /app/.venv /app/.venv
+COPY pyproject.toml ./
 COPY core/ core/
 COPY provider.py config.py main.py ./
 
-ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 EXPOSE 9090
 
-CMD [".venv/bin/python", "main.py"]
+CMD ["uv", "run", "main.py"]
