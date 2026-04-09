@@ -25,4 +25,4 @@ ENV PYTHONUNBUFFERED=1
 
 EXPOSE 9090
 
-CMD ["python", "main.py"]
+CMD [".venv/bin/python", "main.py"]
