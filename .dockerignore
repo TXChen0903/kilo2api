@@ -2,7 +2,10 @@ __pycache__
 *.pyc
 .git
 .gitignore
+.venv
+.claude
+*.md
+data/
 token.json
 accounts.json
-*.md
-.claude
+.python-version
