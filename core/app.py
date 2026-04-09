@@ -14,7 +14,14 @@ from .routes import proxy, accounts, frontend
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.http_client = httpx.AsyncClient(timeout=httpx.Timeout(300, connect=10))
+    # Start periodic balance refresh
+    account_manager = app.state.account_manager
+    provider = app.state.provider
+    if account_manager.accounts:
+        await account_manager.start_balance_refresh(app.state.http_client, provider)
     yield
+    # Stop balance refresh and close HTTP client
+    await account_manager.stop_balance_refresh()
     await app.state.http_client.aclose()
 
 

@@ -49,9 +49,10 @@ async def chat_completions(request: Request):
     http_client = request.app.state.http_client
 
     body = await request.json()
+    model_name = body.get("model", "")
     body = provider.transform_request(body)
 
-    account = account_manager.next()
+    account = account_manager.next(model=model_name)
     if account is None:
         return JSONResponse(
             status_code=503,
@@ -82,7 +83,7 @@ async def chat_completions(request: Request):
                         error_body = await resp.aread()
                         last_error = error_body.decode()
                         print(f"[!] Request failed (attempt {attempt + 1}/{MAX_RETRIES + 1}), status {resp.status_code}, switching account...")
-                        current_account = account_manager.next()
+                        current_account = account_manager.next(model=model_name)
                         if current_account is None:
                             break
                         continue
@@ -123,7 +124,7 @@ async def chat_completions(request: Request):
             last_status = resp.status_code
             last_error_text = resp.text
             print(f"[!] Request failed (attempt {attempt + 1}/{MAX_RETRIES + 1}), status {resp.status_code}, switching account...")
-            current_account = account_manager.next()
+            current_account = account_manager.next(model=model_name)
             if current_account is None:
                 break
 
